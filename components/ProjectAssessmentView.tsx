@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SpotlightCard from './SpotlightCard';
 import { AnalysisState } from '../types';
-import { evaluateProject, ProjectDetails } from '../services/geminiService';
+import { evaluateProject, ProjectDetails } from '../services/aiService';
 import { INDUSTRIES_LIST, SENSORS_LIST } from '../constants';
 
 interface ProjectAssessmentViewProps {

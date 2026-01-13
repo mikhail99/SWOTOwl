@@ -9,7 +9,7 @@ import IntelligenceView from './components/IntelligenceView';
 import ProjectAssessmentView from './components/ProjectAssessmentView';
 import OpportunityMatrixView from './components/OpportunityMatrixView';
 import { AnalysisState } from './types';
-import { OpportunityItem, ProjectDetails } from './services/geminiService';
+import { OpportunityItem, ProjectDetails } from './services/aiService';
 import { INDUSTRIES_LIST, SENSORS_LIST } from './constants';
 
 // Icons
@@ -48,8 +48,8 @@ const ActivityTicker: React.FC = () => {
     <div className="h-6 overflow-hidden relative">
       <div className="animate-fade-in-up key={index} text-xs font-mono text-slate-300 flex items-center justify-end gap-2">
         <span className={`w-1.5 h-1.5 rounded-full ${currentItem.type === 'SCAN' ? 'bg-emerald-400' :
-            currentItem.type === 'PATENT' ? 'bg-amber-400' :
-              currentItem.type === 'MARKET' ? 'bg-blue-400' : 'bg-purple-400'
+          currentItem.type === 'PATENT' ? 'bg-amber-400' :
+            currentItem.type === 'MARKET' ? 'bg-blue-400' : 'bg-purple-400'
           } animate-pulse`}></span>
         {currentItem.text}
       </div>

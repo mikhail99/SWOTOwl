@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SpotlightCard from './SpotlightCard';
-import { generateOpportunities, OpportunityItem } from '../services/geminiService';
+import { generateOpportunities, OpportunityItem } from '../services/aiService';
 import MindMap from './MindMap';
 import { INDUSTRIES_LIST, SENSORS_LIST } from '../constants';
 
@@ -108,8 +108,8 @@ const OpportunityMatrixView: React.FC<OpportunityMatrixViewProps> = ({ onLaunchP
             onClick={handleGenerate}
             disabled={isGenerating}
             className={`px-8 py-4 rounded-lg font-bold text-white transition-all shadow-xl flex items-center gap-3 ${isGenerating
-                ? 'bg-slate-800 cursor-wait text-slate-400'
-                : 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/30 hover:scale-105 active:scale-95'
+              ? 'bg-slate-800 cursor-wait text-slate-400'
+              : 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/30 hover:scale-105 active:scale-95'
               }`}
           >
             {isGenerating ? (

@@ -3,7 +3,7 @@
  * These are simpler and more direct than prompts for larger models
  */
 
-import { ProjectDetails } from './geminiService';
+import { ProjectDetails } from './aiService';
 
 /**
  * SWOT Analysis prompt for local models

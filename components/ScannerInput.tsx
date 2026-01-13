@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { analyzeTech } from '../services/geminiService';
+import { analyzeTech } from '../services/aiService';
 import { AnalysisState } from '../types';
 
 interface ScannerInputProps {
