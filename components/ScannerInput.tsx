@@ -16,7 +16,7 @@ const ScannerInput: React.FC<ScannerInputProps> = ({ onStateChange }) => {
 
     setIsLoading(true);
     onStateChange({ status: 'scanning', data: null });
-    
+
     // Simulate initial scan delay for UX
     setTimeout(async () => {
       onStateChange({ status: 'analyzing', data: null });
@@ -33,7 +33,7 @@ const ScannerInput: React.FC<ScannerInputProps> = ({ onStateChange }) => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-       <div className="relative group">
+      <div className="relative group">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
         <div className="relative flex items-center bg-[#0f172a] rounded-lg border border-slate-700 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
           <div className="pl-4 text-slate-400">
@@ -51,8 +51,8 @@ const ScannerInput: React.FC<ScannerInputProps> = ({ onStateChange }) => {
             type="submit"
             disabled={isLoading}
             className={`mr-1 px-4 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 flex items-center gap-2
-              ${isLoading 
-                ? 'bg-slate-700 text-slate-400 cursor-wait' 
+              ${isLoading
+                ? 'bg-slate-700 text-slate-400 cursor-wait'
                 : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'}
             `}
           >

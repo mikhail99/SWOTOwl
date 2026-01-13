@@ -1,5 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { SwotAnalysis } from "../types";
+import { llmService } from "./llmService";
+import { buildSwotPrompt, parseSwotResponse, buildIdeationPrompt, parseIdeationResponse } from "./prompts";
 
 // Helper to get API key safely
 const getApiKey = (): string | undefined => {
@@ -42,7 +44,7 @@ const COMMON_SCHEMA = {
 
 const extractSources = (response: any): { title: string; uri: string }[] => {
   if (!response.candidates?.[0]?.groundingMetadata?.groundingChunks) return [];
-  
+
   // Filter for chunks that have web data
   const sources = response.candidates[0].groundingMetadata.groundingChunks
     .map((chunk: any) => chunk.web)
@@ -51,18 +53,29 @@ const extractSources = (response: any): { title: string; uri: string }[] => {
   // Deduplicate based on URI
   const uniqueSources: { title: string; uri: string }[] = [];
   const seenUris = new Set();
-  
+
   for (const source of sources) {
     if (!seenUris.has(source.uri)) {
       seenUris.add(source.uri);
       uniqueSources.push(source);
     }
   }
-  
+
   return uniqueSources;
 };
 
+/**
+ * Main switch for analysis
+ */
 export const analyzeTech = async (topic: string, modelId: string = "gemini-3-pro-preview"): Promise<SwotAnalysis> => {
+  if (modelId.startsWith('gemini')) {
+    return analyzeTechGemini(topic, modelId);
+  } else {
+    return analyzeTechLocal(topic, modelId);
+  }
+}
+
+const analyzeTechGemini = async (topic: string, modelId: string): Promise<SwotAnalysis> => {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("API Key not found. Please configured the environment.");
@@ -104,7 +117,7 @@ export const analyzeTech = async (topic: string, modelId: string = "gemini-3-pro
 
     const analysis = JSON.parse(text) as SwotAnalysis;
     analysis.webSources = extractSources(response);
-    
+
     return analysis;
   } catch (error) {
     console.error("Analysis failed:", error);
@@ -112,7 +125,39 @@ export const analyzeTech = async (topic: string, modelId: string = "gemini-3-pro
   }
 };
 
+const analyzeTechLocal = async (topic: string, modelId: string): Promise<SwotAnalysis> => {
+  const status = llmService.getStatus();
+  if (!status.ready) {
+    await llmService.loadModel(modelId);
+  }
+
+  const project: ProjectDetails = {
+    title: topic,
+    technology: topic,
+    market: "General Tech",
+    description: `Perform a deep technical SWOT analysis on ${topic}.`
+  };
+
+  const prompt = buildSwotPrompt(project);
+  const response = await llmService.generate(prompt);
+  const analysis = parseSwotResponse(response);
+
+  analysis.topic = topic;
+  return analysis;
+}
+
+/**
+ * Main switch for Project Evaluation
+ */
 export const evaluateProject = async (details: ProjectDetails, modelId: string = "gemini-3-pro-preview"): Promise<SwotAnalysis> => {
+  if (modelId.startsWith('gemini')) {
+    return evaluateProjectGemini(details, modelId);
+  } else {
+    return evaluateProjectLocal(details, modelId);
+  }
+}
+
+const evaluateProjectGemini = async (details: ProjectDetails, modelId: string): Promise<SwotAnalysis> => {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("API Key not found. Please configured the environment.");
@@ -171,11 +216,41 @@ export const evaluateProject = async (details: ProjectDetails, modelId: string =
   }
 };
 
+const evaluateProjectLocal = async (details: ProjectDetails, modelId: string): Promise<SwotAnalysis> => {
+  const status = llmService.getStatus();
+  if (!status.ready) {
+    await llmService.loadModel(modelId);
+  }
+
+  const prompt = buildSwotPrompt(details);
+  const response = await llmService.generate(prompt);
+  const analysis = parseSwotResponse(response);
+
+  analysis.topic = details.title;
+  return analysis;
+}
+
+/**
+ * Main switch for Opportunity Generation
+ */
 export const generateOpportunities = async (
   technology: string = "All",
   industry: string = "All",
   context: string = "",
   modelId: string = "gemini-3-pro-preview"
+): Promise<OpportunityItem[]> => {
+  if (modelId.startsWith('gemini')) {
+    return generateOpportunitiesGemini(technology, industry, context, modelId);
+  } else {
+    return generateOpportunitiesLocal(technology, industry, context, modelId);
+  }
+}
+
+const generateOpportunitiesGemini = async (
+  technology: string,
+  industry: string,
+  context: string,
+  modelId: string
 ): Promise<OpportunityItem[]> => {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -241,3 +316,19 @@ export const generateOpportunities = async (
     throw error;
   }
 };
+
+const generateOpportunitiesLocal = async (
+  technology: string,
+  industry: string,
+  context: string,
+  modelId: string
+): Promise<OpportunityItem[]> => {
+  const status = llmService.getStatus();
+  if (!status.ready) {
+    await llmService.loadModel(modelId);
+  }
+
+  const prompt = buildIdeationPrompt(technology, industry, context);
+  const response = await llmService.generate(prompt);
+  return parseIdeationResponse(response);
+}
